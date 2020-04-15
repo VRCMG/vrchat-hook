@@ -6,6 +6,8 @@ uintptr_t moduleBaseGameAssembly;
 uintptr_t moduleBaseUnityPlayer;
 bool bFakePing = false, bFly = false, bDblJump = false;
 float zOffset = 0;
+std::vector<unsigned int> pingOffset = { 0xC0, 0x0, 0x18, 0xB8, 0x10, 0xA0, 0x6C };
+std::vector<unsigned int> zAxisOffset = { 0x58, 0x0, 0x370, 0x10, 0x68, 0x0, 0x1FC };
 
 DWORD WINAPI VRCHook(HMODULE hModule) {
     Helper::OpenConsole();
@@ -32,7 +34,7 @@ DWORD WINAPI VRCHook(HMODULE hModule) {
         if (GetAsyncKeyState(50) & 1) {
             bFly = !bFly;
             if (zValuePtr) {
-                zOffset = *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, { 0x58, 0x0, 0x370, 0x10, 0x68, 0x0, 0x1FC });
+                zOffset = *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset);
             }
         }
 
@@ -41,12 +43,12 @@ DWORD WINAPI VRCHook(HMODULE hModule) {
         }
 
         if (bFakePing) {
-            *(int*)Helper::FindM(moduleBaseGameAssembly + 0x0612EB60, { 0xC0, 0x0, 0x18, 0xB8, 0x10, 0xA0, 0x6C }) = 9999;
+            *(int*)Helper::FindM(moduleBaseGameAssembly + 0x0612EB60, pingOffset) = 9999;
         }
 
         if (bDblJump) {
             if (GetAsyncKeyState(VK_SPACE) & 1) {
-                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, { 0x58, 0x0, 0x370, 0x10, 0x68, 0x0, 0x1FC }) += 0.5f;
+                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) += 0.5f;
             }
         }
 
@@ -58,7 +60,7 @@ DWORD WINAPI VRCHook(HMODULE hModule) {
                 zOffset -= 0.1f;
             }
             if (zValuePtr) {
-                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, { 0x58, 0x0, 0x370, 0x10, 0x68, 0x0, 0x1FC }) = zOffset;
+                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) = zOffset;
             }
         }
         Sleep(1);
