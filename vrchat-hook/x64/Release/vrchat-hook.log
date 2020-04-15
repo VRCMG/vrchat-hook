@@ -1,0 +1,8 @@
+﻿  pch.cpp
+  dllmain.cpp
+  helper.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 73 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  vrchat-hook.vcxproj -> C:\Users\bay\source\repos\vrchat-hook\x64\Release\vrc-hook.dll
