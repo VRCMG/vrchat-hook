@@ -4,7 +4,9 @@ uintptr_t moduleBaseGameAssembly;
 uintptr_t moduleBaseUnityPlayer;
 bool bFakePing = false, bFly = false, bDblJump = false;
 float zOffset = 0;
+float coord = 0;
 std::vector<unsigned int> pingOffset = { 0xC0, 0x0, 0x18, 0xB8, 0x10, 0xA0, 0x6C };
+std::vector<unsigned int> xAxisOffset = { 0x40, 0xC0, 0x30, 0x88, 0x18, 0xC0, 0x2C8 };
 std::vector<unsigned int> zAxisOffset = { 0x58, 0x0, 0x370, 0x10, 0x68, 0x0, 0x1FC };
 
 
@@ -15,13 +17,14 @@ void VRCHook(HMODULE hModule) {
     std::cout << "VRC-Hook by bay\n";
     std::cout << "1 - Fake ping\n";
     std::cout << "2 - Fly\n";
-    std::cout << "3 - Z add\n";
+    std::cout << "3 - Double jump add\n";
+    std::cout << "4 - Output X, Z\n";
+
 
     moduleBaseGameAssembly = (uintptr_t)GetModuleHandle("GameAssembly.dll");
     moduleBaseUnityPlayer = (uintptr_t)GetModuleHandle("UnityPlayer.dll");
 
     while (true) {
-        uintptr_t* zValuePtr = (uintptr_t*)(moduleBaseUnityPlayer + 0x150CDE4);
 
         if (GetAsyncKeyState(VK_END) & 1) {
             break;
@@ -33,13 +36,16 @@ void VRCHook(HMODULE hModule) {
 
         if (GetAsyncKeyState(50) & 1) {
             bFly = !bFly;
-            if (zValuePtr) {
-                zOffset = *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset);
-            }
+            zOffset = *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset);
         }
 
         if (GetAsyncKeyState(51) & 1) {
             bDblJump = !bDblJump;
+        }
+
+        if (GetAsyncKeyState(52) & 1) {
+            std::cout << "Current X: " << *(float*)Helper::FindM(moduleBaseGameAssembly + 0x06ACCAF8, xAxisOffset) << "\n";
+            std::cout << "Current Z: " << *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) << "\n";
         }
 
         if (bFakePing) {
@@ -48,7 +54,7 @@ void VRCHook(HMODULE hModule) {
 
         if (bDblJump) {
             if (GetAsyncKeyState(VK_SPACE) & 1) {
-                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) += 0.5f;
+                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) += 0.2f;
             }
         }
 
@@ -59,14 +65,12 @@ void VRCHook(HMODULE hModule) {
             else if (GetAsyncKeyState(0x51) & 1) {
                 zOffset -= 0.1f;
             }
-            if (zValuePtr) {
-                *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) = zOffset;
-            }
+            *(float*)Helper::FindM(moduleBaseUnityPlayer + 0x0150C800, zAxisOffset) = zOffset;
         }
         Sleep(1);
     }
 
-    std::cout << "Unhooked\n";
+    std::cout << "\nUnhooked\n";
 
     Helper::CloseConsole();
     FreeLibraryAndExitThread(hModule, 0);
