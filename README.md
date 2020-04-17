@@ -8,7 +8,9 @@
 
 > Simple vrc internal
 
-> Based on https://mega.nz/file/TwpCgYgZ#3wtPfNfou5nhCKMdgq4h8t28wMTQAbjeU3pO-t5qlaY
+> Based on [GameAssembly.dll.i64](https://mega.nz/file/TwpCgYgZ#3wtPfNfou5nhCKMdgq4h8t28wMTQAbjeU3pO-t5qlaY)
+
+> Usage, run VRChat, start vrc-hook.exe
 
 ## Todo
 ```sh
